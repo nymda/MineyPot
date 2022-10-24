@@ -11,7 +11,7 @@ WSADATA wsaData;
 SOCKET ListenSocket = INVALID_SOCKET;
 
 char jsonTemplate[] = "{\"description\":{\"text\":\"%s\"},\"players\":{\"max\":%i,\"online\":%i},\"version\":{\"name\":\"%s\",\"protocol\":%i}}";
-char jsonFormatted[512] = {};
+char jsonFormatted[512] = {}; //yes 512 bytes is completely arbitary and is way too big but we dont live in the 80s anymore
 
 char pingLogText[] = "%s | Ping from %s";
 char connectionLogText[] = "%s | Logon from %s (%s)";
