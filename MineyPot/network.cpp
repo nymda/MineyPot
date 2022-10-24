@@ -39,6 +39,7 @@ void logNewConnection(int type, char* ipAddy, char* playerName = nullptr) {
 		delete[] newLog;
 		conLog.push_back(newLogSized);
 	}
+	delete[] time;
 	return;
 }
 
@@ -87,8 +88,8 @@ bool clientHandler(SOCKET sock, char* ipAddy) {
 	}
 
 	//Recieve the clients status request, we dont need to do anything with this either
-	byte clientStatusReq[2056];
-	if (recv(sock, (char*)clientStatusReq, 2056, 0) == SOCKET_ERROR) {
+	byte clientStatusReq[1024];
+	if (recv(sock, (char*)clientStatusReq, 1024, 0) == SOCKET_ERROR) {
 		closesocket(sock);
 		return false;
 	}
