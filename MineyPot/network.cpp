@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <thread>
 #include "varint.h"
+#include "network.h"
 #define PORT "25565"
 
 WSADATA wsaData;
@@ -11,8 +12,8 @@ SOCKET ListenSocket = INVALID_SOCKET;
 char jsonTemplate[] = "{\"description\":{\"text\":\"%s\"},\"players\":{\"max\":%i,\"online\":%i},\"version\":{\"name\":\"%s\",\"protocol\":%i}}";
 char jsonFormatted[512] = {};
 
-void updateServerParameters(const char* description, int maxPlayers, int currentPlayers, const char* protocolName, int protocolVersion) {
-	sprintf_s(jsonFormatted, 512, jsonTemplate, description, maxPlayers, currentPlayers, protocolName, protocolVersion);
+void updateServerParameters(const char* description, int maxPlayers, int currentPlayers, protocolVersion pv) {
+	sprintf_s(jsonFormatted, 512, jsonTemplate, description, maxPlayers, currentPlayers, pv.protocolName, pv.protocolID);
 }
 
 bool clientHandler(SOCKET sock) {

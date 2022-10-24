@@ -17,11 +17,16 @@ void CleanupDeviceD3D();
 void ResetDevice();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+protocolVersion selectedVersion = versions[0];
+char description[128] = {};
+int maxPlayers = 32;
+int currentPlayers = 0;
+
 int main()
 {
-    WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("TEMPLATE"), NULL };
+    WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("MineyPot"), NULL };
     ::RegisterClassEx(&wc);
-    HWND hwnd = ::CreateWindow(wc.lpszClassName, _T("TEMPLATE"), WS_OVERLAPPEDWINDOW, 100, 100, 1280, 720, NULL, NULL, wc.hInstance, NULL);
+    HWND hwnd = ::CreateWindow(wc.lpszClassName, _T("MineyPot"), WS_OVERLAPPEDWINDOW, 100, 100, 640, 320, NULL, NULL, wc.hInstance, NULL);
 
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd))
@@ -32,7 +37,8 @@ int main()
     }
 
     //init network stuff
-    updateServerParameters("MineyPot", 32, 18, "1.18.2", 758);
+    strncpy_s(description, "MineyPot", 128);
+    updateServerParameters(description, maxPlayers, currentPlayers, selectedVersion);
     init();
 
     // Show the window
@@ -74,12 +80,26 @@ int main()
         ImGui::NewFrame();
         ImGui::SetNextWindowPos({ 0, 0 });
         ImGui::SetNextWindowSize(whole_content_size);
-        ImGui::Begin("ImguiTemplate", 0, flags);
-        ImGui::Text("ImGui template - d3d9");
+        ImGui::Begin("MineyPotGui", 0, flags);
 
-        //
-        // GUI DRAW CODE HERE
-        //
+        ImGui::InputText("Description", description, 128);
+        ImGui::InputInt("Max players", &maxPlayers);
+        ImGui::InputInt("Current players", &currentPlayers);
+        if (ImGui::BeginCombo("##ProtocolSelection", selectedVersion.protocolName)) 
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(versions); n++)
+            {
+                bool is_selected = (strcmp(selectedVersion.protocolName, versions[n].protocolName) == 0);
+                if (ImGui::Selectable(versions[n].protocolName, is_selected)) {
+                    selectedVersion = versions[n];
+                    if (is_selected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+ 
+                }
+            }
+            ImGui::EndCombo();
+        }
 
         ImGui::End();
         ImGui::EndFrame();
