@@ -82,16 +82,17 @@ int main()
         ImGui::SetNextWindowSize(whole_content_size);
         ImGui::Begin("MineyPotGui", 0, flags);
 
-        ImGui::InputText("Description", description, 128);
-        ImGui::InputInt("Max players", &maxPlayers);
-        ImGui::InputInt("Current players", &currentPlayers);
-        if (ImGui::BeginCombo("##ProtocolSelection", selectedVersion.protocolName)) 
+        if(ImGui::InputText("Description", description, 128)){ updateServerParameters(description, maxPlayers, currentPlayers, selectedVersion); }
+        if(ImGui::InputInt("Max players", &maxPlayers)){ updateServerParameters(description, maxPlayers, currentPlayers, selectedVersion); }
+        if(ImGui::InputInt("Current players", &currentPlayers)){ updateServerParameters(description, maxPlayers, currentPlayers, selectedVersion); }
+        if (ImGui::BeginCombo("Protocol", selectedVersion.protocolName)) 
         {
             for (int n = 0; n < IM_ARRAYSIZE(versions); n++)
             {
                 bool is_selected = (strcmp(selectedVersion.protocolName, versions[n].protocolName) == 0);
                 if (ImGui::Selectable(versions[n].protocolName, is_selected)) {
                     selectedVersion = versions[n];
+                    updateServerParameters(description, maxPlayers, currentPlayers, selectedVersion);
                     if (is_selected) {
                         ImGui::SetItemDefaultFocus();
                     }
@@ -147,7 +148,6 @@ bool CreateDeviceD3D(HWND hWnd)
     g_d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
     g_d3dpp.EnableAutoDepthStencil = TRUE;
     g_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
-    g_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
     if (g_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &g_d3dpp, &g_pd3dDevice) < 0) {
         return false;
     }

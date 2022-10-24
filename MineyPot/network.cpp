@@ -12,8 +12,15 @@ SOCKET ListenSocket = INVALID_SOCKET;
 char jsonTemplate[] = "{\"description\":{\"text\":\"%s\"},\"players\":{\"max\":%i,\"online\":%i},\"version\":{\"name\":\"%s\",\"protocol\":%i}}";
 char jsonFormatted[512] = {};
 
+char pingLogText[] = "%s | Ping from %s";
+char connectionLogText[] = "%s | Connection from user %s / %s";
+
 void updateServerParameters(const char* description, int maxPlayers, int currentPlayers, protocolVersion pv) {
 	sprintf_s(jsonFormatted, 512, jsonTemplate, description, maxPlayers, currentPlayers, pv.protocolName, pv.protocolID);
+}
+
+void logNewConnection(int type, const char* ipAddy, const char* playerName = 0) {
+
 }
 
 bool clientHandler(SOCKET sock) {
@@ -26,15 +33,35 @@ bool clientHandler(SOCKET sock) {
 		return false;
 	}
 
-	if (clientHandshake[handshakeSize-1] == 0x02) {
-		//client is attempting to connect to the server, disconnect to show a generic error
+	if (clientHandshake[0] == 0xFE) {
+		//Client has sent a legacy request, will emplement this later
+		printf_s("Legacy client\n");
 		closesocket(sock);
 		return false;
 	}
 
-	if (clientHandshake[0] == 0xFE) {
-		//Client has sent a legacy request, will emplement this later
-		printf_s("Legacy client\n");
+	if (clientHandshake[handshakeSize - 1] == 0x02) {
+		//client is attempting to connect to the server
+
+		//get client infomation, playername, etc
+		byte clientData[1024];
+		int clientDataSize = recv(sock, (char*)clientData, 1024, 0);
+
+		int cdptr = 0;
+		varint packetLength = clientData + cdptr;
+		cdptr += packetLength.len();
+
+		varint packetID = clientData + cdptr;
+		cdptr += packetID.len();
+
+		varint playerNameLength = clientData + cdptr;
+		cdptr += playerNameLength.len();
+
+		char* clientName = new char[playerNameLength.iVal() + 1];
+		ZeroMemory(clientName, playerNameLength.iVal() + 1);
+		memcpy(clientName, (char*)(clientData + cdptr), playerNameLength.iVal());
+		printf_s("Login from user: %s\n", clientName);
+
 		closesocket(sock);
 		return false;
 	}
