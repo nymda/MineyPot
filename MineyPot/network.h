@@ -2,7 +2,10 @@
 #include <ws2tcpip.h>
 #include <stdio.h>
 #include <thread>
+#include <vector>
 #define PORT "25565"
+
+extern std::vector<char*> conLog;
 
 struct protocolVersion {
 	const char* protocolName;
@@ -69,7 +72,8 @@ const static protocolVersion versions[] = {
 	{"1.7.2", 4}
 };
 
-bool clientHandler(SOCKET sock);
+const char* getTime();
+bool clientHandler(SOCKET sock, char* ipAddy);
 void listener();
 bool init();
 void updateServerParameters(const char* description, int maxPlayers, int currentPlayers, protocolVersion pv);

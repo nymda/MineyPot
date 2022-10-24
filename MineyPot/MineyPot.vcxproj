@@ -149,6 +149,7 @@
     <ClCompile Include="imgui_widgets.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="varint.cpp" />
+    <ClCompile Include="vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imconfig.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="varint.h" />
+    <ClInclude Include="vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

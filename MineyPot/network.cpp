@@ -2,6 +2,7 @@
 #include <ws2tcpip.h>
 #include <stdio.h>
 #include <thread>
+#include <vector>
 #include "varint.h"
 #include "network.h"
 #define PORT "25565"
@@ -13,17 +14,35 @@ char jsonTemplate[] = "{\"description\":{\"text\":\"%s\"},\"players\":{\"max\":%
 char jsonFormatted[512] = {};
 
 char pingLogText[] = "%s | Ping from %s";
-char connectionLogText[] = "%s | Connection from user %s / %s";
+char connectionLogText[] = "%s | Logon from %s (%s)";
 
 void updateServerParameters(const char* description, int maxPlayers, int currentPlayers, protocolVersion pv) {
 	sprintf_s(jsonFormatted, 512, jsonTemplate, description, maxPlayers, currentPlayers, pv.protocolName, pv.protocolID);
 }
 
-void logNewConnection(int type, const char* ipAddy, const char* playerName = 0) {
-
+void logNewConnection(int type, char* ipAddy, char* playerName = nullptr) {
+	char* newLog = new char[128];
+	const char* time = getTime();
+	if (type == 0) {
+		sprintf_s(newLog, 128, pingLogText, time, ipAddy);
+		int stringActualLength = strlen(newLog);
+		char* newLogSized = new char[stringActualLength + 1];
+		sprintf_s(newLogSized, stringActualLength + 1, newLog);
+		delete[] newLog;
+		conLog.push_back(newLogSized);
+	}
+	else if(type == 1 && playerName != 0) {
+		sprintf_s(newLog, 128, connectionLogText,time, ipAddy, playerName);
+		int stringActualLength = strlen(newLog);
+		char* newLogSized = new char[stringActualLength + 1];
+		sprintf_s(newLogSized, stringActualLength + 1, newLog);
+		delete[] newLog;
+		conLog.push_back(newLogSized);
+	}
+	return;
 }
 
-bool clientHandler(SOCKET sock) {
+bool clientHandler(SOCKET sock, char* ipAddy) {
 
 	//Recieve the clients handshake, we dont need to read this but will test for a legacy or modern client
 	byte clientHandshake[1024];
@@ -60,7 +79,8 @@ bool clientHandler(SOCKET sock) {
 		char* clientName = new char[playerNameLength.iVal() + 1];
 		ZeroMemory(clientName, playerNameLength.iVal() + 1);
 		memcpy(clientName, (char*)(clientData + cdptr), playerNameLength.iVal());
-		printf_s("Login from user: %s\n", clientName);
+
+		logNewConnection(1, ipAddy, clientName);
 
 		closesocket(sock);
 		return false;
@@ -118,6 +138,8 @@ bool clientHandler(SOCKET sock) {
 		return false;
 	};
 
+	logNewConnection(0, ipAddy);
+
 	closesocket(sock);
 	return true;
 }
@@ -134,8 +156,7 @@ void listener() {
 		if (nextClient != INVALID_SOCKET) {
 			char ip[32] = {};
 			inet_ntop(AF_INET, &addr.sin_addr, (PSTR)&ip, 32);
-			printf_s("New connection from : %s\n", ip);
-			clientHandler(nextClient);
+			clientHandler(nextClient, ip);
 		}
 		else {
 			printf_s("Invalid socket");
@@ -193,4 +214,13 @@ bool init() {
 	//start listening for new clients
 	std::thread tListener(listener);
 	tListener.detach();
+}
+
+const char* getTime() {
+	char* timeBuffer = new char[16];
+	time_t now = time(0);
+	struct tm tstruct;
+	localtime_s(&tstruct, &now);
+	strftime(timeBuffer, 16, "%I:%M:%S", &tstruct);
+	return timeBuffer;
 }

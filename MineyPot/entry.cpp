@@ -7,6 +7,7 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include <tchar.h>
+#include <vector>
 
 static LPDIRECT3D9              g_pD3D = NULL;
 static LPDIRECT3DDEVICE9        g_pd3dDevice = NULL;
@@ -21,6 +22,8 @@ protocolVersion selectedVersion = versions[0];
 char description[128] = {};
 int maxPlayers = 32;
 int currentPlayers = 0;
+
+std::vector<char*> conLog = {};
 
 int main()
 {
@@ -102,6 +105,13 @@ int main()
             ImGui::EndCombo();
         }
 
+        ImGui::ListBoxHeader("Connections", ImVec2{0, -1});
+        for (char* c : conLog)
+        {
+            ImGui::Text(c);
+        }
+        ImGui::ListBoxFooter();
+
         ImGui::End();
         ImGui::EndFrame();
 
@@ -131,6 +141,7 @@ int main()
     CleanupDeviceD3D();
     ::DestroyWindow(hwnd);
     ::UnregisterClass(wc.lpszClassName, wc.hInstance);
+
 
     return 0;
 }
