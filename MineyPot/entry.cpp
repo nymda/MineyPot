@@ -23,7 +23,9 @@ char description[128] = {};
 int maxPlayers = 32;
 int currentPlayers = 0;
 
-std::vector<char*> conLog = {};
+std::vector<connectionEvent> conLog;
+char pingLogText[] = "%s | Ping from %s";
+char connectionLogText[] = "%s | Logon from %s (%s)";
 
 int main()
 {
@@ -106,9 +108,19 @@ int main()
         }
 
         ImGui::ListBoxHeader("Connections", ImVec2{0, -1});
-        for (char* c : conLog)
+        for (connectionEvent& c : conLog)
         {
-            ImGui::Text(c);
+            switch (c.eventType)
+            {
+                case connectionType::PING:
+                    ImGui::Text("%s | Ping from %s", c.eventTime, c.eventIP);
+                    break;
+                case connectionType::LOGON:
+                    ImGui::Text("%s | Logon from %s (%s)", c.eventTime, c.eventIP, c.eventUsername);
+                    break;
+                default:
+                    break;
+            }
         }
         ImGui::ListBoxFooter();
 

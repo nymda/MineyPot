@@ -5,12 +5,24 @@
 #include <vector>
 #define PORT "25565"
 
-extern std::vector<char*> conLog;
+enum class connectionType {
+	PING = 0,
+	LOGON = 1
+};
 
 struct protocolVersion {
 	const char* protocolName;
 	int protocolID;
 };
+
+struct connectionEvent {
+	connectionType eventType;
+	char eventTime[16];
+	char eventIP[16];
+	char eventUsername[20];
+};
+
+extern std::vector<connectionEvent> conLog;
 
 const static protocolVersion versions[] = {
 	{"1.19.2", 760},

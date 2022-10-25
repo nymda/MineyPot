@@ -13,33 +13,21 @@ SOCKET ListenSocket = INVALID_SOCKET;
 char jsonTemplate[] = "{\"description\":{\"text\":\"%s\"},\"players\":{\"max\":%i,\"online\":%i},\"version\":{\"name\":\"%s\",\"protocol\":%i}}";
 char jsonFormatted[512] = {}; //yes 512 bytes is completely arbitary and is way too big but we dont live in the 80s anymore
 
-char pingLogText[] = "%s | Ping from %s";
-char connectionLogText[] = "%s | Logon from %s (%s)";
-
 void updateServerParameters(const char* description, int maxPlayers, int currentPlayers, protocolVersion pv) {
 	sprintf_s(jsonFormatted, 512, jsonTemplate, description, maxPlayers, currentPlayers, pv.protocolName, pv.protocolID);
 }
 
-void logNewConnection(int type, char* ipAddy, char* playerName = nullptr) {
-	char* newLog = new char[128];
-	const char* time = getTime();
-	if (type == 0) {
-		sprintf_s(newLog, 128, pingLogText, time, ipAddy);
-		int stringActualLength = strlen(newLog);
-		char* newLogSized = new char[stringActualLength + 1];
-		sprintf_s(newLogSized, stringActualLength + 1, newLog);
-		delete[] newLog;
-		conLog.push_back(newLogSized);
+void logNewConnection(connectionType type, char* ipAddy, char* playerName = nullptr) {
+
+	connectionEvent ce;
+	ce.eventType = type;
+	sprintf_s(ce.eventIP, ipAddy);
+	sprintf_s(ce.eventTime, getTime());
+	if (playerName) {
+		sprintf_s(ce.eventUsername, playerName);
 	}
-	else if(type == 1 && playerName != 0) {
-		sprintf_s(newLog, 128, connectionLogText,time, ipAddy, playerName);
-		int stringActualLength = strlen(newLog);
-		char* newLogSized = new char[stringActualLength + 1];
-		sprintf_s(newLogSized, stringActualLength + 1, newLog);
-		delete[] newLog;
-		conLog.push_back(newLogSized);
-	}
-	delete[] time;
+	conLog.insert(conLog.begin(), ce);
+
 	return;
 }
 
@@ -81,7 +69,7 @@ bool clientHandler(SOCKET sock, char* ipAddy) {
 		ZeroMemory(clientName, playerNameLength.iVal() + 1);
 		memcpy(clientName, (char*)(clientData + cdptr), playerNameLength.iVal());
 
-		logNewConnection(1, ipAddy, clientName);
+		logNewConnection(connectionType::LOGON, ipAddy, clientName);
 
 		closesocket(sock);
 		return false;
@@ -139,7 +127,7 @@ bool clientHandler(SOCKET sock, char* ipAddy) {
 		return false;
 	};
 
-	logNewConnection(0, ipAddy);
+	logNewConnection(connectionType::PING, ipAddy);
 
 	closesocket(sock);
 	return true;
