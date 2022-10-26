@@ -7,7 +7,7 @@ supports:
 -All standard versions  
 -Max / Current players  
 -Displaying pings  
--Displaying logo attempts w/ username  
+-Displaying logon attempts w/ username  
 
 Todo:  
 -Logging to CSV  
