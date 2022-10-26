@@ -1,6 +1,7 @@
 # MineyPot
 
-Simple minecraft honeypot  
+Simple minecraft honeypot
+
 supports:  
 -Description  
 -All standard versions  
