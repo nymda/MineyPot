@@ -12,3 +12,4 @@ Todo:
 -Logging to CSV  
 -Custom server favicons  
 -Custom kick / disconnect reasons  
+-Handle legacy ping packets
