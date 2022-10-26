@@ -31,7 +31,7 @@ int main()
 {
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("MineyPot"), NULL };
     ::RegisterClassEx(&wc);
-    HWND hwnd = ::CreateWindow(wc.lpszClassName, _T("MineyPot"), WS_OVERLAPPEDWINDOW, 100, 100, 640, 320, NULL, NULL, wc.hInstance, NULL);
+    HWND hwnd = ::CreateWindow(wc.lpszClassName, _T("MineyPot"), WS_OVERLAPPEDWINDOW, 100, 100, 550, 350, NULL, NULL, wc.hInstance, NULL);
 
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd))
@@ -61,7 +61,6 @@ int main()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
 
     MSG msg;
     ZeroMemory(&msg, sizeof(msg));
