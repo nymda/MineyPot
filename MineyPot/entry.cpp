@@ -4,6 +4,7 @@
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_win32.h"
 #include <d3d9.h>
+#include <d3dx9.h>
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include <tchar.h>
@@ -27,6 +28,9 @@ std::vector<connectionEvent> conLog;
 char pingLogText[] = "%s | Ping from %s";
 char connectionLogText[] = "%s | Logon from %s (%s)";
 
+LPDIRECT3DTEXTURE9 faviconTexture;
+bool faviconLoaded = false;
+
 int main()
 {
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("MineyPot"), NULL };
@@ -44,11 +48,17 @@ int main()
     //init network stuff
     strncpy_s(description, "MineyPot", 128);
     updateServerParameters(description, maxPlayers, currentPlayers, selectedVersion);
+    //D3DXCreateTextureFromFile(g_pd3dDevice, "favicon.png", faviconTexture);
     init();
 
-    // Show the window
+    // Show the window6
     ::ShowWindow(hwnd, SW_SHOWDEFAULT);
     ::UpdateWindow(hwnd);
+
+    HRESULT hr = D3DXCreateTextureFromFile(g_pd3dDevice, L"favicon.png", &faviconTexture);
+    if (hr == D3D_OK) {
+        faviconLoaded = true;
+    }
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -122,6 +132,13 @@ int main()
             }
         }
         ImGui::ListBoxFooter();
+
+        if (faviconLoaded) {
+            ImVec2 windowSize = ImGui::GetWindowSize();
+            int faviconSize = 128;
+            ImGui::SetCursorPos(ImVec2(windowSize.x - faviconSize - 7, windowSize.y - faviconSize - 8));
+            ImGui::Image(faviconTexture, ImVec2(faviconSize, faviconSize));
+        }
 
         ImGui::End();
         ImGui::EndFrame();

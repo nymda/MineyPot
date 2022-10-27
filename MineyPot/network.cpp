@@ -10,8 +10,10 @@
 WSADATA wsaData;
 SOCKET ListenSocket = INVALID_SOCKET;
 
+char csvLogPath[] = "MineyPotLog.csv";
 char jsonTemplate[] = "{\"description\":{\"text\":\"%s\"},\"players\":{\"max\":%i,\"online\":%i},\"version\":{\"name\":\"%s\",\"protocol\":%i}}";
 char jsonFormatted[512] = {}; //yes 512 bytes is completely arbitary and is way too big but we dont live in the 80s anymore
+
 
 void updateServerParameters(const char* description, int maxPlayers, int currentPlayers, protocolVersion pv) {
 	sprintf_s(jsonFormatted, 512, jsonTemplate, description, maxPlayers, currentPlayers, pv.protocolName, pv.protocolID);
