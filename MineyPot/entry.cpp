@@ -48,17 +48,16 @@ int main()
     //init network stuff
     strncpy_s(description, "MineyPot", 128);
     updateServerParameters(description, maxPlayers, currentPlayers, selectedVersion);
-    //D3DXCreateTextureFromFile(g_pd3dDevice, "favicon.png", faviconTexture);
     init();
 
     // Show the window6
     ::ShowWindow(hwnd, SW_SHOWDEFAULT);
     ::UpdateWindow(hwnd);
 
-    HRESULT hr = D3DXCreateTextureFromFile(g_pd3dDevice, L"favicon.png", &faviconTexture);
-    if (hr == D3D_OK) {
-        faviconLoaded = true;
-    }
+    //HRESULT hr = D3DXCreateTextureFromFile(g_pd3dDevice, L"favicon.png", &faviconTexture);
+    //if (hr == D3D_OK) {
+    //    faviconLoaded = true;
+    //}
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
